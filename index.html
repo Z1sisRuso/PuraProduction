@@ -686,23 +686,6 @@
       #visitcard { padding: 56px 0 72px; }
       .visitcard-copy { margin-bottom: 28px; font-size: 13px; }
     }
-
-    /* ── TOUCH / MOBILE CURSOR FIX ── */
-    @media (hover: none), (pointer: coarse) {
-      /* Restore system cursor everywhere */
-      body        { cursor: auto !important; }
-      *           { cursor: auto !important; }
-      a, button,
-      [role="button"],
-      .case-item,
-      .case-expand-hit,
-      .case-collapse,
-      .contact-link { cursor: pointer !important; }
-
-      /* Hide the custom cursor elements entirely */
-      .cursor,
-      .cursor-ring { display: none !important; }
-    }
   </style>
 </head>
 <body>
@@ -799,7 +782,7 @@
       <div class="contact-links reveal">
         <div class="contact-link contact-link--email" onclick="copyContact('prot382@gmail.com', this)">
           <span class="contact-link-label">Email</span>
-          <span class="contact-link-val">prot382&#64;gmail.com</span>
+          <span class="contact-link-val">prot382@gmail.com</span>
           <span class="contact-copy-hint">Скопировать ↗</span>
         </div>
         <div class="contact-link contact-link--tg" onclick="copyContact('@fonrarix', this)">
@@ -991,33 +974,26 @@
       });
     })();
 
-    const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches
-      || ('ontouchstart' in window)
-      || (navigator.maxTouchPoints > 0);
-
     const cursor = document.getElementById('cursor');
     const ring   = document.getElementById('cursorRing');
-
-    if (!isTouchDevice) {
-      let mx=0, my=0, rx=0, ry=0;
-      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-      (function animCursor() {
-        cursor.style.left = mx+'px'; cursor.style.top = my+'px';
-        rx += (mx-rx)*.12; ry += (my-ry)*.12;
-        ring.style.left = rx+'px'; ring.style.top = ry+'px';
-        requestAnimationFrame(animCursor);
-      })();
-      document.querySelectorAll('a, .case-item, .case-expand-hit, .case-collapse, .contact-link').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          cursor.style.width = cursor.style.height = '5px';
-          ring.style.width = ring.style.height = '52px';
-        });
-        el.addEventListener('mouseleave', () => {
-          cursor.style.width = cursor.style.height = '10px';
-          ring.style.width = ring.style.height = '36px';
-        });
+    let mx=0, my=0, rx=0, ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    (function animCursor() {
+      cursor.style.left = mx+'px'; cursor.style.top = my+'px';
+      rx += (mx-rx)*.12; ry += (my-ry)*.12;
+      ring.style.left = rx+'px'; ring.style.top = ry+'px';
+      requestAnimationFrame(animCursor);
+    })();
+    document.querySelectorAll('a, .case-item, .case-expand-hit, .case-collapse, .contact-link').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = cursor.style.height = '5px';
+        ring.style.width = ring.style.height = '52px';
       });
-    }
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = cursor.style.height = '10px';
+        ring.style.width = ring.style.height = '36px';
+      });
+    });
 
     (function initVisitcardVideo() {
       var v = document.getElementById('visitcard-video');
@@ -1054,4 +1030,14 @@
     function copyContact(text, el) {
       navigator.clipboard.writeText(text).then(() => {
         el.classList.add('copied');
-        const toast = document.getElement
+        const toast = document.getElementById('copyToast');
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          el.classList.remove('copied');
+        }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>
